@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  name           String?
+  image          String?
+  email          String    @unique  
+  password_hash  String  
+
+  // Relations
+  customerTasks  Task[]    @relation("CustomerTasks")
+  workerTasks    Task[]    @relation("WorkerTasks")
+
+  paymentsMade   Payment[] @relation("Payer")
+  paymentsRecv   Payment[] @relation("Payee")
+
+  reviewsGiven   Review[]  @relation("Reviewer")
+  reviewsRecv    Review[]  @relation("Reviewee")
+
+  workerProfile  Worker?
+  adminProfile   Admin?
+  payouts        Payout[]
+}
+
+model Worker {
+  id              Int     @id @default(autoincrement())
+  userId          Int     @unique
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name            String?
+  phone           String?  
+  description     String?  
+  location        String?  
+  pricing         String?  
+  verified        Boolean? @default(false)  
+  rating          Int?  
+  completed_tasks Int?  
+  skills          String[]
+}
+
+model Admin {
+  id          Int     @id @default(autoincrement())
+  userId      Int     @unique
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  privileges  String[]   
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?  
+  status      Status   @default(PENDING)
+  price       String?
+
+  customerId  Int
+  customer    User     @relation("CustomerTasks", fields: [customerId], references: [id])
+
+  workerId    Int?
+  worker      User?    @relation("WorkerTasks", fields: [workerId], references: [id])
+
+  payment     Payment?
+  payout      Payout?
+  reviews     Review[]
+  dispute     Dispute?
+}
+
+model Payment {
+  id               Int      @id @default(autoincrement())
+  amount           String?
+  platform_fee     String?
+  payout_amount    String?
+  status           Status   @default(PENDING)
+  transaction_ref  String?
+
+  taskId           Int @unique
+  task             Task     @relation(fields: [taskId], references: [id])
+
+  payerId          Int
+  payer            User     @relation("Payer", fields: [payerId], references: [id])
+
+  payeeId          Int
+  payee            User     @relation("Payee", fields: [payeeId], references: [id])
+
+  payout           Payout?
+}
+
+model Payout {
+  id              Int      @id @default(autoincrement())
+  amount          String?
+  method          String?
+  processed_at    String?
+  status          String?
+  transaction_ref String?
+
+  taskId          Int  @unique
+  task            Task @relation(fields: [taskId], references: [id])
+
+  paymentId       Int  @unique
+  payment         Payment @relation(fields: [paymentId], references: [id])
+
+  userId          Int
+  worker          User @relation(fields: [userId], references: [id])
+}
+
+model Review {
+  id        Int    @id @default(autoincrement())
+  rating    Int?
+  comment   String?  
+
+  taskId    Int @unique
+  task      Task @relation(fields: [taskId], references: [id])
+
+  reviewerId Int
+  reviewer   User @relation("Reviewer", fields: [reviewerId], references: [id])
+
+  revieweeId Int
+  reviewee   User @relation("Reviewee", fields: [revieweeId], references: [id])
+}
+
+model Dispute {
+  id        Int     @id @default(autoincrement())
+  reason    String?
+  status    DisputeStatus @default(PENDING)
+
+  taskId    Int @unique
+  task      Task @relation(fields: [taskId], references: [id])
+}
+
+enum Status {
+  PENDING
+  ACTIVE
+  COMPLETED
+}
+
+enum DisputeStatus {
+  PENDING
+  RESOLVED  
+}
