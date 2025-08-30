@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id    Int     @default(autoincrement()) @id
+  email String  @unique
+  name  String
+  username  String
+  image  String?
+  password_hash  String 
+  createdAt DateTime @default(now())
+
+  admin Admin?
+  worker Worker?
+  tasks Task[]
+  reviews Review[]
+  payments Payment[]
+  messages Message[]
+}
+
+model Admin{
+  id    Int     @default(autoincrement()) @id
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId],references: [id])
+  userId  Int @unique 
+}
+
+model Worker{
+  id    Int     @default(autoincrement()) @id
+  phone String
+  createdAt DateTime @default(now())
+  description String
+  location String
+  pricing String?
+  verified Boolean @default(false)
+  rating Int?
+  skills String[]
+  completedTasks Int?  
+  user User @relation(fields: [userId],references: [id])
+  userId  Int @unique 
+
+  tasks Task[]
+  reviews Review[]
+  payments Payment[]
+  payouts Payout[]
+  messages Message[]
+}
+
+model Task{
+  id    Int     @default(autoincrement()) @id
+  title String
+  description String? 
+  createdAt DateTime @default(now())
+  status TaskStatus @default(CREATED)
+  price String
+  worker Worker @relation(fields: [workerId],references: [id])
+  workerId Int 
+  user User @relation(fields: [userId],references: [id])
+  userId Int 
+  reviews Review[]
+  payments Payment[]
+}
+
+enum TaskStatus {
+  CREATED
+  ASSIGNED
+  IN_PROGRESS
+  SUBMITTED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+  DISPUTED
+  FAILED
+}
+
+model Review{
+  id    Int     @default(autoincrement()) @id
+  rating Int
+  comment String? 
+  createdAt DateTime @default(now())
+  task Task? @relation(fields: [taskId],references: [id])
+  taskId Int? 
+  user User @relation(fields: [userId],references: [id])
+  userId Int
+  worker Worker? @relation(fields: [workerId],references: [id])
+  workerId Int?
+}
+
+model Payment{
+  id    Int     @default(autoincrement()) @id
+  amount Int
+  platformFee Int
+  transactionRef String
+  processedAt DateTime @default(now())
+  status PaymentStatus @default(INITIATED)
+
+  taskId Int 
+  task Task @relation(fields: [taskId],references: [id])
+
+  workerId Int
+  worker Worker @relation(fields: [workerId],references: [id])
+
+  userId Int
+  user User @relation(fields: [userId],references: [id])
+
+  payouts Payout[]
+}
+
+enum PaymentStatus {
+  INITIATED
+  PENDING
+  AUTHORIZED
+  ESCROW
+  RELEASED
+  CANCELLED
+  FAILED
+  REFUNDED
+  DISPUTED
+  CHARGEBACK
+}
+
+model Payout{
+  id    Int     @default(autoincrement()) @id
+  amount Int
+  method Int  
+  processedAt DateTime @default(now())
+  transactionRef String
+  status PayoutStatus @default(PENDING)
+
+  paymentId Int 
+  payment Payment @relation(fields: [paymentId],references: [id])
+
+  workerId Int
+  worker Worker @relation(fields: [workerId],references: [id])
+}
+
+enum PayoutStatus{
+  PROCESSING
+  COMPLETED
+  PENDING
+  FAILED
+  CANCELLED
+  ON_HOLD
+  REVERSED
+}
+
+model Message{
+  id    Int     @default(autoincrement()) @id
+  text String  
+  createdAt DateTime @default(now())  
+  status String  
+  messageType MessageType 
+  userId Int?
+  user User? @relation(fields: [userId],references: [id])
+
+  workerId Int?
+  worker Worker? @relation(fields: [workerId],references: [id])
+
+}
+
+enum MessageType{
+  AI
+  SYSTEM
+  WORKER
+}
+
+
