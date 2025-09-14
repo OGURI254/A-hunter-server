@@ -4,20 +4,20 @@ import { Badge } from "../ui/badge"
 import Link from "next/link"
 
 
-const CourseCard = () => {
+const CourseCard = ({_id,title,description,thumbnailUrl,tutor,visibility,createdAt}) => {
   return (
-    <Card className="pt-0 ">
-        <div className="bg-amber-600 h-[80%] aspect-video rounded-t-xl ">
+    <Card className="pt-0 w-[400px]">
+        <div className="bg-amber-600 h-[60%] aspect-video rounded-t-xl ">
         <img 
-        src="https://images.unsplash.com/photo-1694903110330-cc64b7e1d21d?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXV0b21hdGlvbnxlbnwwfHwwfHx8MA%3D%3D" 
-        alt="" 
+        src={thumbnailUrl} 
+        alt={title}
         className="object-cover rounded-t-xl"
         />
         </div>
         <div className="px-4">
-        <Link href='/courses/1'>
-            <p className="font-semibold text-lg">The complete guide to Automation</p>
-            <p className="text-sm">Lewis Gitonga, Joseph Oguri</p>
+        <Link href={`tutor/courses/${_id}`}>
+            <p className="font-semibold text-lg">{title}</p>
+            <p className="text-sm">{description}</p>
         </Link>
         <div className="flex items-center gap-1.5">
             <Star size={16} />

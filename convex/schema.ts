@@ -17,9 +17,17 @@ export default defineSchema({
         courseId:v.id("courses"),
         title:v.string(),
         overview:v.optional(v.string()),
-        objectives: v.optional(v.array(v.string())),
+        objectives: v.string(),
         order: v.number(), 
         createdAt:v.number(),
         updatedAt:v.number(),
-    })
+    }).index("by_course",['courseId']),    
+    lessons: defineTable({
+        moduleId: v.id("modules"),
+        title: v.string(),
+        notes: v.optional(v.string()), // <-- BlockNote JSON here
+        order: v.number(),
+        createdAt: v.number(),
+        updatedAt: v.number(),
+    }).index("by_module",['moduleId']),
 })

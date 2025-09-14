@@ -6,10 +6,16 @@ import { v } from "convex/values";
 export const getAllPublic = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db
-      .query("courses")
-      .filter((q) => q.eq(q.field("visibility"), "public"))
-      .collect();
+    try {      
+      const results = await ctx.db
+        .query("courses")
+        .filter((q) => q.eq(q.field("visibility"), "public"))
+        .collect();
+      return results
+    } catch (error) {
+      console.log(error);
+      return null
+    }
   },
 });
 
@@ -18,10 +24,16 @@ export const getAllByTutor = query({
     tutor:v.string()
   },
   handler: async (ctx,args) => {
-    return await ctx.db
-      .query("courses")
-      .withIndex("by_tutor", (q) => q.eq("tutor",args.tutor))
-      .collect();
+    try {
+      const results = await ctx.db
+        .query("courses")
+        .withIndex("by_tutor", (q) => q.eq("tutor",args.tutor))
+        .collect();
+      return results      
+    } catch (error) {
+      console.log(error);
+      return null
+    }
   },
 });
 
@@ -29,7 +41,13 @@ export const getAllByTutor = query({
 export const getById = query({
   args: { courseId: v.id("courses") },
   handler: async (ctx, { courseId }) => {
-    return await ctx.db.get(courseId);
+    try {      
+      const result = await ctx.db.get(courseId);
+      return result
+    } catch (error) {
+      console.log(error);
+      return null
+    }
   },
 });
 
@@ -45,10 +63,45 @@ export const create = mutation({
     visibility: v.union(v.literal("public"), v.literal("private"), v.literal("draft")),    
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("courses", {
-      ...args,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+    try {
+      
+      const result = await ctx.db.insert("courses", {
+        ...args,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+      return result
+    } catch (error) {
+      console.log(error);
+      return null
+    }
+  },
+});
+
+export const getCourseWithModules = query({
+  args: { courseId: v.id("courses") },
+  handler: async (ctx, { courseId }) => {
+    // Fetch course
+    try {
+      
+      const course = await ctx.db.get(courseId);
+      if (!course) throw new Error("Course not found");
+  
+      // Fetch modules belonging to this course, ordered
+      const modules = await ctx.db
+        .query("modules")
+        .withIndex("by_course", (q) => q.eq("courseId", courseId))
+        .order("asc")
+        .collect();
+  
+      const result = {
+        ...course,
+        modules,
+      }
+      return result;
+    } catch (error) {
+      console.log(error);
+      return null
+    }
   },
 });

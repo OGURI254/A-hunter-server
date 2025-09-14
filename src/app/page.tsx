@@ -13,10 +13,7 @@ const page = () => {
         <div>
           <h2 className="font-semibold text-xl">Our Courses</h2>
           <section className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 pt-2">
-            <CourseCard/>
-            <CourseCard/>
-            <CourseCard/>
-            <CourseCard/>
+            
           </section>
         </div>                  
     </>

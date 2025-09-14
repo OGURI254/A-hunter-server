@@ -15,6 +15,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { DrawerDialogDemo } from "./FormCreateModule";
 
 interface Module {
   id: string;
@@ -109,9 +110,8 @@ export default function ModuleManager() {
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-gray-800">Course Modules</h2>
-        <button className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-          + Add Module
-        </button>
+        <DrawerDialogDemo/>
+        
       </div>
 
       {/* Module List with DnD Kit */}
