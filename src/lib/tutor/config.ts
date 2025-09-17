@@ -12,7 +12,7 @@ import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { z } from "zod";
 import { tool } from "@langchain/core/tools";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { HumanMessage } from "@langchain/core/messages";
+import { BaseMessage, HumanMessage, AIMessage } from "@langchain/core/messages";
 import { api, db } from "../convex";
 
 
@@ -82,10 +82,10 @@ const toolNode = new ToolNode([lessonLookupTool]);
  * Core model call
  */
 const callModel = async (state: typeof MessagesAnnotation.State) => {
-  const query = new HumanMessage(state.messages[0]);
-  const response = await modelWithTools.invoke(state.messages);
+  const normalized = normalizeMessages(state.messages)
+  const response = await modelWithTools.invoke(normalized);
   console.log(response);
-  return { messages: response };
+  return { messages: [response] };
 };
 
 // Define LangGraph workflow
@@ -96,10 +96,39 @@ const workflow = new StateGraph(MessagesAnnotation)
   .addEdge("model", "tools")
   .addEdge("model", END);
 
+
+
+
+function normalizeMessages(messages: any): BaseMessage[] {
+  if (!messages) return [];
+
+  // Already an array of BaseMessage
+  if (Array.isArray(messages) && messages[0] instanceof BaseMessage) {
+    return messages;
+  }
+
+  // If it's a single message, wrap in array
+  if (messages instanceof BaseMessage) {
+    return [messages];
+  }
+
+  // If it's raw object(s) with { role, content }
+  if (Array.isArray(messages)) {
+    return messages.map((m) =>
+      m.role === "user"
+        ? new HumanMessage(m.content ?? "")
+        : new AIMessage(m.content ?? "")
+    );
+  }
+
+  // Default → treat as user text
+  return [new HumanMessage(String(messages))];
+}
 // Add memory (keeps conversation context across turns)
 const memory = new MemorySaver();
 
 export const app = workflow.compile({ checkpointer: memory });
+
 
 // 🔑 Usage Example:
 // await loadLessons("abc123"); // load a module into memory
