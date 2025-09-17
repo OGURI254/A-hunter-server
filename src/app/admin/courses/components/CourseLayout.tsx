@@ -39,6 +39,9 @@ import { api } from "../../../../../convex/_generated/api"
 import { useParams, useSearchParams,useRouter } from "next/navigation"
 
 import { BlockEditorCreateLesson, BlockEditorUpdateLesson } from "./BlockEditor"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import ModuleForm from "./ModuleCreate"
+import { Button } from "@/components/ui/button"
 
 
 const CourseLayout = () => {
@@ -154,6 +157,20 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
+
+                    <Button 
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams.toString());        
+                      params.delete('l')
+                      
+                      params.set("new","l"); // 👈 add or update param                            
+                      params.set("m",module?._id); // 👈 add or update param                            
+                      router.push(`?${params.toString()}`);
+                    }}
+                    variant='outline' className="w-full">
+                      <Plus/> Lesson
+                    </Button>
+
                     
                   </SidebarMenu>
                 </SidebarGroupContent>
@@ -161,6 +178,22 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
             </SidebarGroup>
           </Collapsible>
         ))}
+
+        <Dialog>
+          <DialogTrigger>
+            <Button className="w-full mt-8">
+              <Plus/> Module
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>You're creating a module</DialogTitle>              
+            </DialogHeader>
+            <ModuleForm/>
+          </DialogContent>
+        </Dialog>
+
+        
         
         
       </SidebarContent>

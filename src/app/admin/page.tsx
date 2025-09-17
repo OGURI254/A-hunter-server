@@ -11,7 +11,7 @@ export default function AdminDashboard() {
   console.log(courses);
 
   return (
-    <div>
+    <div className='max-w-5xl mx-auto px-4 py-8'>
       <a href="/admin/courses/new">
         <Button><Plus/> Course</Button>
       </a>

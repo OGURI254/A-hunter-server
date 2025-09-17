@@ -19,7 +19,10 @@ export const createCourse = mutation({
 // Get all courses
 export const listCourses = query({
   handler: async (ctx) => {
-    return await ctx.db.query("courses").collect();
+    return await ctx.db
+    .query("courses")
+    .order("desc")
+    .collect();
   },
 });
 
