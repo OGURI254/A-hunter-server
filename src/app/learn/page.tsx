@@ -4,14 +4,16 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useQuery } from 'convex/react'
 import { Brain, MessageCircle, Mic, PenToolIcon, Star, StarsIcon, Users } from 'lucide-react'
-import React from 'react'
+import React, { Suspense } from 'react'
 import { api } from '../../../convex/_generated/api'
 
 const page = () => {
   const courses = useQuery(api.courses.listCourses)
   console.log(courses);
   return (
-    <>
+    <Suspense fallback={
+      <div>Loading...</div>
+    }>
     <section className='min-h-[60vh] flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between bg-[#F50516]/10 p-8'>
       <div className='grid gap-1.5'>
         <div className='flex items-center gap-1 text-[#F50516]'>
@@ -76,7 +78,7 @@ const page = () => {
         </section>
       </section>
     )}
-    </>
+    </Suspense>
   )
 }
 

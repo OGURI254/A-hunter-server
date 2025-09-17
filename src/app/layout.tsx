@@ -9,6 +9,7 @@ import { ConvexClientProvider } from "@/components/providers/ConvexProvider";
 import ChatWidget from "@/components/globals/ChatWidget";
 import TutorChatWidget from "@/components/globals/TutorChatWidget";
 import WidgetLayout from "@/components/globals/WidgetLayout";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,12 +36,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ConvexClientProvider>
-          <Header/>
-          {children}
-          <WidgetLayout/>
-          <Footer/>
-        </ConvexClientProvider>
+        <Suspense fallback={
+          <div>Loading ....</div>
+        }>
+          <ConvexClientProvider>
+            <Header/>
+            {children}
+            <WidgetLayout/>
+            <Footer/>
+          </ConvexClientProvider>
+        </Suspense>
       </body>
     </html>
   );

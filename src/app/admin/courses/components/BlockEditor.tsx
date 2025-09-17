@@ -7,9 +7,10 @@ import "@blocknote/shadcn/style.css";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { api } from "../../../../../convex/_generated/api";
 import { Parastoo } from "next/font/google";
+import { Divide } from "lucide-react";
 
 // export const BlockEditorTutor = () => {
 //   const searchParams = useSearchParams();
@@ -191,12 +192,14 @@ export const BlockEditorCreateLesson = ({moduleId}:{moduleId:any}) => {
   
 
   return (
-    <>
+    <Suspense fallback={
+      <div>Loading ...</div>
+    }>
       <BlockNoteView editor={editor} theme="light" />      
       <Button 
       onClick={handleSave}
       className="cursor-pointer">Save Lesson</Button>
-    </>
+    </Suspense>
   );
 };
 
@@ -260,12 +263,14 @@ export const BlockEditorUpdateLesson = ({lessonId}:{lessonId:any}) => {
   
 
   return (
-    <>
+    <Suspense fallback={
+      <div>Loading...</div>
+    }>
       <BlockNoteView editor={editor} theme="light" />      
       <Button 
       onClick={handleSave}
       className="cursor-pointer">Update Lesson</Button>
-    </>
+    </Suspense>
   );
 };
 
