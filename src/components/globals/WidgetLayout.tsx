@@ -1,19 +1,27 @@
 'use client'
 
-import { usePathname } from "next/navigation"
-import TutorChatWidget from "./TutorChatWidget"
+import { usePathname, useSearchParams } from "next/navigation"
 import ChatWidget from "./ChatWidget"
+import CompanionComponent from "../VapiChat"
+
 
 const WidgetLayout = () => {
-    const pathName = usePathname()
-    const isLearning = pathName.includes('learn')
+    const pathName = usePathname()    
+    const searchParams = useSearchParams();
+    const lessonId = searchParams.get("l");
+    
   return (
     <div>
-        {isLearning ?
-        <TutorChatWidget/>
-        :
+        {!lessonId ?
         <ChatWidget/>
+        :
+        <CompanionComponent                    
+          lessonId = {lessonId}
+          voice="sarah"        
+          style="formal"
+        />        
         }
+        
     </div>
   )
 }

@@ -36,13 +36,10 @@ const Header = () => {
             className={`${pathName == '/learn' && "text-[#F50516] border-b-2 border-[#F50516]"}`}
             >Learn</Link>
 
-            <Link 
-            href='/community'
-            className={`${pathName == '/community' && "text-[#F50516] border-b-2 border-[#F50516]"}`}
-            >Community</Link>
+            
         </nav>
         <div className='lg:flex items-center gap-2 hidden'>
-            <DropdownMenu>
+            {/* <DropdownMenu>
                 <DropdownMenuTrigger>
                     <Button variant='ghost'>
                         {selectedOption} <ChevronDown/> 
@@ -54,7 +51,8 @@ const Header = () => {
                     <DropdownMenuItem onSelect={() => setSelectedOption("Employer")}>Employer</DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => setSelectedOption("Pro")}>Pro</DropdownMenuItem>                    
                 </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu> */}
+            
             <Button variant='ghost'>Log In</Button>
             <Button className='bg-[#F50516]'>Join Now</Button>
         </div>
