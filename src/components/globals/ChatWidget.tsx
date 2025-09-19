@@ -178,6 +178,8 @@ export default function ChatWidget() {
     }
   };
 
+  // console.log(activeChat?.messages);
+
   return (
     <section className="fixed bottom-3 right-2">
       {chatOpen ?
